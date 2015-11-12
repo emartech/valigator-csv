@@ -1,17 +1,17 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'csv_validator/version'
+require 'valigator/csv/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'csv_validator'
-  spec.version       = CsvValidator::VERSION
-  spec.authors       = ['Istvan Demeter', 'Daniel Nagy']
-  spec.email         = %w(demeter.istvan@gmail.com naitodai@gmail.com)
+  spec.name          = 'valigator-csv'
+  spec.version       = Valigator::CSV::VERSION
+  spec.authors       = ['Daniel Nagy', 'Istvan Demeter']
+  spec.email         = ['naitodai@gmail.com', 'demeter.istvan@gmail.com']
 
   spec.summary       = %q{Yet another CSV validator library}
   spec.description   = %q{Yet another CSV validator library. Just better.}
-  spec.homepage      = 'https://github.com/emartech/csv_validator'
+  spec.homepage      = 'https://github.com/emartech/valigator-csv'
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "exe"
