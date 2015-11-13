@@ -18,11 +18,10 @@ module Valigator
             line =~ //
           rescue ArgumentError => e
             errors << {
-                line: 1,
+                line: i,
                 error: e.message,
                 content: line
             }
-            break
           end
         end
 
