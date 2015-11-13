@@ -1,7 +1,7 @@
 module Valigator
   module CSV
     class Validator
-      attr_reader :filename
+      attr_reader :filename, :errors
 
 
 
@@ -12,20 +12,33 @@ module Valigator
 
 
       def validate
-        errors = []
+        @errors = []
+
+        check_encoding
+      end
+
+
+
+      private
+
+      def check_encoding
         File.foreach(filename).with_index(1) do |line, i|
           begin
             line =~ //
           rescue ArgumentError => e
-            errors << {
-                line: i,
-                error: e.message,
-                content: line
-            }
+            add_to_errors i, e.message, line
           end
         end
+      end
 
-        errors
+
+
+      def add_to_errors(line_number, error_message, content)
+        @errors << {
+            line: line_number,
+            error: error_message,
+            content: content
+        }
       end
 
     end
