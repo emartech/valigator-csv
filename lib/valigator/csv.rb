@@ -1,7 +1,6 @@
-require "valigator/csv/version"
-
 module Valigator
   module CSV
-    # Your code goes here...
+    autoload :Version, 'valigator/csv/version'
+    autoload :Validator, 'valigator/csv/validator'
   end
 end
