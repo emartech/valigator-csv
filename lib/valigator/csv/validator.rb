@@ -1,5 +1,6 @@
 require 'csvlint'
 require 'active_support/core_ext/string/filters'
+require 'active_support/hash_with_indifferent_access'
 
 module Valigator
   module CSV
@@ -42,17 +43,24 @@ module Valigator
 
 
       def build_header_fields(options = {})
-        options[:headers].map { |header| ::Csvlint::Field.new(header) }
+        options[:headers].map do |header|
+          header_definition = JSON.parse JSON.dump(header)
+
+          ::Csvlint::Field.new(header_definition["name"], header_definition["constraints"])
+        end
       end
 
 
 
-      def add_to_errors(error)
-        @errors << {
-          line: error.row,
-          error: error.type.to_s,
-          content: error.content.to_s.truncate(80)
+      def add_to_errors(original_error)
+        error = {
+          row: original_error.row,
+          column: original_error.column,
+          type: original_error.type.to_s,
+          content: original_error.content.to_s.truncate(80)
         }
+
+        @errors << error.reject { |_, v| v.blank? }
       end
 
     end
