@@ -19,6 +19,14 @@ describe Valigator::CSV::Validator do
     end
 
 
+    it 'should detect invalid encodinga' do
+      subject = described_class.new fixture('invalid_encoding.csv')
+      subject.validate(encoding: 'ISO-8859-9')
+
+      expect(subject.errors).to eq([])
+    end
+
+
     it 'should detect quoting problems' do
       subject = described_class.new fixture('unclosed_quote.csv')
       subject.validate

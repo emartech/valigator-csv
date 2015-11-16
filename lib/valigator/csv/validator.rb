@@ -26,10 +26,12 @@ module Valigator
       private
 
       def check_with_csvlint(options = {})
-        validator = ::Csvlint::Validator.new(File.open(filename), {}, build_schema(options))
+        File.open(filename, "r:#{options[:encoding] || 'UTF-8'}") do |file|
+          validator = ::Csvlint::Validator.new(file, {}, build_schema(options))
 
-        validator.errors.each { |error| add_to_errors error }
-        validator.warnings.each { |warning| add_to_errors warning }
+          validator.errors.each { |error| add_to_errors error }
+          validator.warnings.each { |warning| add_to_errors warning }
+        end
       end
 
 
@@ -53,6 +55,8 @@ module Valigator
 
 
       def add_to_errors(original_error)
+        return if original_error.type == :encoding
+
         error = {
           row: original_error.row,
           column: original_error.column,
