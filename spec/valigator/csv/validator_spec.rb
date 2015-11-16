@@ -53,6 +53,17 @@ describe Valigator::CSV::Validator do
                                      {row: 4, column: 3, type: 'missing_value'}
                                    ])
     end
+
+
+    it 'should report not unique values' do
+      subject = described_class.new fixture('not_unique.csv')
+
+      subject.validate headers: [
+        {name: 'id', constraints: {unique: true}},{name: 'h'}
+      ]
+
+      expect(subject.errors).to eq([{ row: 4, column: 1, type: "unique", content: "1" }])
+    end
   end
 
 end
