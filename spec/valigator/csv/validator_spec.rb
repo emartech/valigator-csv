@@ -3,43 +3,27 @@ require 'spec_helper'
 
 describe Valigator::CSV::Validator do
   describe '#validate' do
-    subject { described_class.new(fixture(csv_file)) }
+    it 'should collect no errors for valid files' do
+      subject = described_class.new fixture('valid.csv')
+      subject.validate
 
-
-    context "the CSV is valid" do
-      let(:csv_file) { "valid.csv" }
-
-
-      it 'returns empty array for a valid file' do
-        subject.validate
-
-        expect(subject.errors).to eq []
-      end
+      expect(subject.errors).to eq []
     end
 
-    context 'the CSV has encoding problems' do
-      let(:csv_file) { 'invalid-byte-sequence.csv' }
 
-      it 'returns the lines have encoding problems' do
-        expected_error_1 = {
-            line: 1,
-            error: "invalid byte sequence in UTF-8",
-            content: "\"Data\",\"Dependencia Origem\",\"Hist\xF3rico\",\"Data do Balancete\",\"N\xFAmero do documento\",\"Valor\",\r\n"
-        }
-        expected_error_2 = {
-            line: 3,
-            error: "invalid byte sequence in UTF-8",
-            content: "\"11/01/2012\",\"0000-9\",\"Transfer\xEAncia on line - 01/11 4885     256620-6 XXXXXXXXXXXXX\",\"\",\"224885000256620\",\"100.00\",\r\n"
-        }
+    it 'should detect invalid encoding' do
+      subject = described_class.new fixture('invalid_encoding.csv')
+      subject.validate
 
-
-        subject.validate
-
-        expect(subject.errors).to include(expected_error_1, expected_error_2)
-      end
+      expect(subject.errors).to eq([{line: 3, error: 'invalid_encoding', content: '3'}])
     end
 
+
+    it 'should detect quoting problems' do
+      subject = described_class.new fixture('unclosed_quote.csv')
+      subject.validate
+
+      expect(subject.errors).to eq([{line: 4, error: 'unclosed_quote', content: "a1,\"a2\",\"a3\r\nb1,b2,b3\r\nb1,b2,b3\r\nb1,b2,b3\r\nb1,b2,b3\r\nb1,b2,b3\r\nb1,b2,b3\r\nb1,b..."}])
+    end
   end
 end
-
-
