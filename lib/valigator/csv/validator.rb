@@ -34,14 +34,14 @@ module Valigator
 
 
       def build_schema(options = {})
+        return unless options[:headers]
+
         ::Csvlint::Schema.new("", build_header_fields(options))
       end
 
 
 
       def build_header_fields(options = {})
-        return unless options[:headers]
-
         options[:headers].map { |header| ::Csvlint::Field.new(header) }
       end
 
