@@ -25,5 +25,14 @@ describe Valigator::CSV::Validator do
 
       expect(subject.errors).to eq([{line: 4, error: 'unclosed_quote', content: "a1,\"a2\",\"a3\r\nb1,b2,b3\r\nb1,b2,b3\r\nb1,b2,b3\r\nb1,b2,b3\r\nb1,b2,b3\r\nb1,b2,b3\r\nb1,b..."}])
     end
+
+
+    it 'should report missing headers' do
+      subject = described_class.new fixture('malformed_header.csv')
+      subject.validate(headers: %w[h1 h2 h3])
+
+      expect(subject.errors).to eq([{line: 1, error: 'malformed_header', content: "h1,h2"}])
+    end
   end
+
 end

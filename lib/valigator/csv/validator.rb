@@ -14,31 +14,44 @@ module Valigator
 
 
 
-      def validate
+      def validate(options = {})
         @errors = []
 
-        check_with_csvlint
+        check_with_csvlint(options)
       end
 
 
 
       private
 
-      def check_with_csvlint
-        validator = ::Csvlint::Validator.new(File.open(filename))
+      def check_with_csvlint(options = {})
+        validator = ::Csvlint::Validator.new(File.open(filename), {}, build_schema(options))
 
-        validator.errors.each do |error|
-          add_to_errors error.row, error.type.to_s, error.content
-        end
+        validator.errors.each { |error| add_to_errors error }
+        validator.warnings.each { |warning| add_to_errors warning }
       end
 
 
 
-      def add_to_errors(line_number, error_message, content)
+      def build_schema(options = {})
+        ::Csvlint::Schema.new("", build_header_fields(options))
+      end
+
+
+
+      def build_header_fields(options = {})
+        return unless options[:headers]
+
+        options[:headers].map { |header| ::Csvlint::Field.new(header) }
+      end
+
+
+
+      def add_to_errors(error)
         @errors << {
-          line: line_number,
-          error: error_message,
-          content: content.to_s.truncate(80)
+          line: error.row,
+          error: error.type.to_s,
+          content: error.content.to_s.truncate(80)
         }
       end
 
