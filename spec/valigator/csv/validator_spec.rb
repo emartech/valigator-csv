@@ -67,11 +67,22 @@ describe Valigator::CSV::Validator do
       subject = described_class.new fixture('not_unique.csv')
 
       subject.validate headers: [
-        {name: 'id', constraints: {unique: true}},{name: 'h'}
+        {name: 'id', constraints: {unique: true}},
+        {name: 'h'}
       ]
 
-      expect(subject.errors).to eq([{ row: 4, column: 1, type: "unique", content: "1" }])
+      expect(subject.errors).to eq([{row: 4, column: 1, type: "unique", content: "1"}])
     end
+
+
+    it 'should use the provided dialect to parse the CSV' do
+      subject = described_class.new fixture('valid_custom.csv')
+
+      subject.validate dialect: {delimiter: ";", quotaChar: "'"}
+
+      expect(subject.errors).to eq([])
+    end
+
   end
 
 end

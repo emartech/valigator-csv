@@ -1,6 +1,5 @@
 require 'csvlint'
 require 'active_support/core_ext/string/filters'
-require 'active_support/hash_with_indifferent_access'
 
 module Valigator
   module CSV
@@ -27,11 +26,19 @@ module Valigator
 
       def check_with_csvlint(options = {})
         File.open(filename, "r:#{options[:encoding] || 'UTF-8'}") do |file|
-          validator = ::Csvlint::Validator.new(file, {}, build_schema(options))
+          validator = ::Csvlint::Validator.new(file, build_dialect(options), build_schema(options))
 
           validator.errors.each { |error| add_to_errors error }
           validator.warnings.each { |warning| add_to_errors warning }
         end
+      end
+
+
+
+      def build_dialect(options = {})
+        return {} unless options[:dialect]
+
+        stringify_keys options[:dialect]
       end
 
 
@@ -46,10 +53,16 @@ module Valigator
 
       def build_header_fields(options = {})
         options[:headers].map do |header|
-          header_definition = JSON.parse JSON.dump(header)
+          header_definition = stringify_keys(header)
 
           ::Csvlint::Field.new(header_definition["name"], header_definition["constraints"])
         end
+      end
+
+
+
+      def stringify_keys(hash)
+        JSON.parse JSON.dump(hash)
       end
 
 
