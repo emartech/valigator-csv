@@ -11,13 +11,13 @@ describe Valigator::CSV::Validator do
     end
 
 
-    xit 'should detect quoting problems' do
+    it 'should detect quoting problems' do
       subject = described_class.new fixture('unclosed_quote.csv')
       subject.validate
 
-      expect(subject.errors.first).to eq([Valigator::CSV::Error.new({row: 4,
+      expect(subject.errors.first).to eq(Valigator::CSV::Error.new({row: 4,
                                                                      type: 'unclosed_quote',
-                                                                     message: "Unclosed quoted field on line 4."})])
+                                                                     message: "Unclosed quoted field on line 4."}))
     end
 
 

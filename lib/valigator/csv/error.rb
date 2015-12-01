@@ -2,36 +2,73 @@ module Valigator
   module CSV
     class Error
 
-      attr_accessor :row, :type, :message
+      attr_reader :row, :type, :message
 
 
 
-      def initialize(err_info)
-        case err_info
-        when Hash
-          err_info.each { |k, v| instance_variable_set("@#{k}", v) }
-        when ::CSV::MalformedCSVError
-          @row = /line (?<lineno>\d+)/.match(err_info.message)[:lineno].to_i
-          @type = map_to_type(err_info.message)
-          @message = err_info.message
+      def initialize(error)
+        case error
+          when Hash
+            build_from_hash error
+          when ::CSV::MalformedCSVError
+            build_from_error error
         end
+      end
+
+
+
+      def ==(other)
+        row == other.row && message == other.message && type == other.type
       end
 
 
 
       private
 
+      def build_from_hash(error)
+        build error[:type], error[:message], error[:row]
+      end
 
-      def map_to_type(error_message)
-        {
-          /Missing or stray quote/ => 'stray_quote',
-          /Unquoted fields do not allow/ => 'line_breaks',
-          /Illegal quoting/ => 'illegal_quoting',
-          /Field size exceeded/ => 'field_size'
-        }.each do |message, type|
-          return type if error_message =~ message
+
+
+      def build_from_error(error)
+        build map_to_type(error.message), error.message, determine_row(error.message)
+      end
+
+
+
+      def determine_row(message)
+        /line (?<lineno>\d+)/.match(message)[:lineno].to_i
+      end
+
+
+
+      def build(type, message, row)
+        @type = type
+        @row = row
+        @message = message
+      end
+
+
+
+      def map_to_type(message)
+        case message
+          when /Missing or stray quote/
+            'stray_quote'
+          when /Unquoted fields do not allow/
+            'line_breaks'
+          when /Illegal quoting/
+            'illegal_quoting'
+          when /Field size exceeded/
+            'field_size'
+          when /Unclosed quoted field/
+            p message
+            'unclosed_quote'
+          else
+            raise ArgumentError, 'unknown type'
         end
       end
+
 
     end
   end
