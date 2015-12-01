@@ -16,8 +16,8 @@ describe Valigator::CSV::Validator do
       subject.validate
 
       expect(subject.errors.first).to eq(Valigator::CSV::Error.new({row: 4,
-                                                                     type: 'unclosed_quote',
-                                                                     message: "Unclosed quoted field on line 4."}))
+                                                                    type: 'unclosed_quote',
+                                                                    message: "Unclosed quoted field on line 4."}))
     end
 
 
