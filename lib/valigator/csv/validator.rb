@@ -14,8 +14,8 @@ module Valigator
 
 
 
-      def validate
-        ::CSV.foreach(@filename) { |_row| }
+      def validate(options = {})
+        ::CSV.foreach(@filename, "r:#{options[:encoding] || 'UTF-8'}") { |_row| }
       rescue ::CSV::MalformedCSVError, ArgumentError => error
         @errors << CSV::Error.new(error)
       end

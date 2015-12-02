@@ -12,11 +12,19 @@ module Valigator
         end
 
 
-        it 'should detect invalid encoding' do
+        it 'should detect invalid byte sequence when opening with default encoding' do
           subject = described_class.new fixture('invalid_encoding.csv')
           subject.validate
 
           expect(subject.errors).to eq([Error.new(row: nil, type: 'invalid_encoding', message: 'invalid byte sequence in UTF-8')])
+        end
+
+
+        it 'should not report byte sequence error when opened with the correct encoding' do
+          subject = described_class.new fixture('invalid_encoding.csv')
+          subject.validate(encoding: 'ISO-8859-9')
+
+          expect(subject.errors).to eq([])
         end
 
 
