@@ -1,9 +1,7 @@
 require 'spec_helper'
 
-module Valigator
-  describe CSV do
+  describe 'CSV' do
     it 'has a version number' do
-      expect(CSV::VERSION).not_to be nil
+      expect(Valigator::CSV::VERSION).not_to be nil
     end
   end
-end
