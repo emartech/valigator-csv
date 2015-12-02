@@ -12,6 +12,14 @@ module Valigator
         end
 
 
+        it 'should use the provided dialect to parse the CSV' do
+          subject = described_class.new fixture('valid_custom.csv')
+          subject.validate col_sep: ";", quote_char: "'"
+
+          expect(subject.errors).to eq([])
+        end
+
+
         it 'should detect invalid byte sequence when opening with default encoding' do
           subject = described_class.new fixture('invalid_encoding.csv')
           subject.validate

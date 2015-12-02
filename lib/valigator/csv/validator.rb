@@ -15,9 +15,21 @@ module Valigator
 
 
       def validate(options = {})
-        ::CSV.foreach(@filename, "r:#{options[:encoding] || 'UTF-8'}") { |_row| }
+        ::CSV.foreach(@filename, build_options(options)) { |_row|}
       rescue ::CSV::MalformedCSVError, ArgumentError => error
         @errors << CSV::Error.new(error)
+      end
+
+
+
+      private
+
+      def build_options(options = {})
+        {
+          col_sep: options[:col_sep] || ',',
+          quote_char: options[:quote_char] || '"',
+          encoding: options[:encoding] || 'UTF-8'
+        }
       end
 
     end
