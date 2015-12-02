@@ -23,6 +23,16 @@ module Valigator
 
 
 
+      def to_hash
+        {
+          row: row,
+          type: type,
+          message: message
+        }
+      end
+
+
+
       private
 
       def build_from_hash(error)

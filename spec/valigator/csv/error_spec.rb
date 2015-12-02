@@ -26,11 +26,11 @@ describe Valigator::CSV::Error do
 
     context "from MalformedCSVError" do
       [
-          [::CSV::MalformedCSVError.new("Missing or stray quote in line #{row}"), 'stray_quote'],
-          [::CSV::MalformedCSVError.new("Unquoted fields do not allow \\r or \\n (line #{row})."), 'line_breaks'],
-          [::CSV::MalformedCSVError.new("Illegal quoting in line #{row}."), 'illegal_quoting'],
-          [::CSV::MalformedCSVError.new("Field size exceeded on line #{row}."), 'field_size'],
-          [::CSV::MalformedCSVError.new("Unclosed quoted field on line #{row}."), 'unclosed_quote']
+        [::CSV::MalformedCSVError.new("Missing or stray quote in line #{row}"), 'stray_quote'],
+        [::CSV::MalformedCSVError.new("Unquoted fields do not allow \\r or \\n (line #{row})."), 'line_breaks'],
+        [::CSV::MalformedCSVError.new("Illegal quoting in line #{row}."), 'illegal_quoting'],
+        [::CSV::MalformedCSVError.new("Field size exceeded on line #{row}."), 'field_size'],
+        [::CSV::MalformedCSVError.new("Unclosed quoted field on line #{row}."), 'unclosed_quote']
       ].each do |original_error, type|
         it "maps correctly" do
           error = described_class.new(original_error)
@@ -52,6 +52,15 @@ describe Valigator::CSV::Error do
           described_class.new(::CSV::MalformedCSVError.new('I forgot to handle this error on line 666.'))
         end.to raise_error(ArgumentError, 'unknown type')
       end
+    end
+  end
+
+
+  describe "#to_hash" do
+    it "should return the error as a hash" do
+      error = described_class.new row: 1, type: 'stray_quote', message: "Missing or stray quote in line 1"
+
+      expect(error.to_hash).to eq row: 1, type: 'stray_quote', message: "Missing or stray quote in line 1"
     end
   end
 end
