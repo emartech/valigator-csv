@@ -8,10 +8,10 @@ module Valigator
 
       def initialize(error)
         case error
-        when Hash
-          build_from_hash error
-        when ::CSV::MalformedCSVError
-          build_from_error error
+          when Hash
+            build_from_hash error
+          when StandardError
+            build_from_error error
         end
       end
 
@@ -38,7 +38,8 @@ module Valigator
 
 
       def determine_row(message)
-        /line (?<lineno>\d+)/.match(message)[:lineno].to_i
+        matches = /line (?<lineno>\d+)/.match(message)
+        matches[:lineno].to_i if matches
       end
 
 
@@ -53,18 +54,20 @@ module Valigator
 
       def map_to_type(message)
         case message
-        when /Missing or stray quote/
-          'stray_quote'
-        when /Unquoted fields do not allow/
-          'line_breaks'
-        when /Illegal quoting/
-          'illegal_quoting'
-        when /Field size exceeded/
-          'field_size'
-        when /Unclosed quoted field/
-          'unclosed_quote'
-        else
-          raise ArgumentError, 'unknown type'
+          when /Missing or stray quote/
+            'stray_quote'
+          when /Unquoted fields do not allow/
+            'line_breaks'
+          when /Illegal quoting/
+            'illegal_quoting'
+          when /Field size exceeded/
+            'field_size'
+          when /Unclosed quoted field/
+            'unclosed_quote'
+          when /invalid byte sequence/
+            'invalid_encoding'
+          else
+            raise ArgumentError, 'unknown type'
         end
       end
 

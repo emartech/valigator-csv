@@ -1,21 +1,33 @@
 require 'spec_helper'
 
+module Valigator
+  module CSV
+    describe Validator do
+      describe '#validate' do
+        it 'should collect no errors for valid files' do
+          subject = described_class.new fixture('valid.csv')
+          subject.validate
 
-describe Valigator::CSV::Validator do
-  describe '#validate' do
-    it 'should collect no errors for valid files' do
-      subject = described_class.new fixture('valid.csv')
-      subject.validate
+          expect(subject.errors).to eq []
+        end
 
-      expect(subject.errors).to eq []
+
+        it 'should detect invalid encoding' do
+          subject = described_class.new fixture('invalid_encoding.csv')
+          subject.validate
+
+          expect(subject.errors).to eq([Error.new(row: nil, type: 'invalid_encoding', message: 'invalid byte sequence in UTF-8')])
+        end
+
+
+        it 'should detect quoting problems' do
+          subject = described_class.new fixture('unclosed_quote.csv')
+          subject.validate
+
+          expect(subject.errors).to eq [Error.new(row: 4, type: 'unclosed_quote', message: 'Unclosed quoted field on line 4.')]
+        end
+      end
     end
 
-
-    it 'should detect quoting problems' do
-      subject = described_class.new fixture('unclosed_quote.csv')
-      subject.validate
-
-      expect(subject.errors.first).to eq Valigator::CSV::Error.new(row: 4, type: 'unclosed_quote', message: "Unclosed quoted field on line 4.")
-    end
   end
 end

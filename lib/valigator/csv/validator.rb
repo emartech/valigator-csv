@@ -1,5 +1,4 @@
 require 'csv'
-require 'active_support/core_ext/string/filters'
 
 module Valigator
   module CSV
@@ -17,8 +16,8 @@ module Valigator
 
       def validate
         ::CSV.foreach(@filename) { |_row| }
-      rescue ::CSV::MalformedCSVError => e
-        @errors << Valigator::CSV::Error.new(e)
+      rescue ::CSV::MalformedCSVError, ArgumentError => error
+        @errors << CSV::Error.new(error)
       end
 
     end
