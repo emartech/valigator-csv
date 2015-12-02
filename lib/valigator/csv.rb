@@ -1,6 +1,7 @@
 module Valigator
   module CSV
-    autoload :Version, 'valigator/csv/version'
+    autoload :Error, 'valigator/csv/error'
     autoload :Validator, 'valigator/csv/validator'
+    autoload :Version, 'valigator/csv/version'
   end
 end
