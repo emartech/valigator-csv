@@ -17,6 +17,8 @@ module Valigator
       def validate(options = {})
         ::CSV.foreach(@filename, build_options(options)) { |_row|}
       rescue ::CSV::MalformedCSVError, ArgumentError => error
+        raise if unrelated_error?(error)
+
         @errors << CSV::Error.new(error)
       end
 
@@ -30,6 +32,12 @@ module Valigator
           quote_char: options[:quote_char] || '"',
           encoding: options[:encoding] || 'UTF-8'
         }
+      end
+
+
+
+      def unrelated_error?(error)
+        error.is_a?(ArgumentError) && error.message != 'invalid byte sequence in UTF-8'
       end
 
     end

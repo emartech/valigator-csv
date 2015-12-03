@@ -42,6 +42,14 @@ module Valigator
 
           expect(subject.errors).to eq [Error.new(row: 4, type: 'unclosed_quote', message: 'Unclosed quoted field on line 4.')]
         end
+
+
+        it 'should (re)raise error, if it is not directly parsing related' do
+          subject = described_class.new fixture('unclosed_quote.csv')
+
+          expect { subject.validate quote_char: 'asd'}.to raise_error ArgumentError, ':quote_char has to be a single character String'
+        end
+
       end
     end
 

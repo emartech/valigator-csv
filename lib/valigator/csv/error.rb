@@ -1,5 +1,9 @@
 module Valigator
   module CSV
+    class UnhandledTypeError < StandardError
+    end
+
+
     class Error
 
       attr_reader :row, :type, :message
@@ -77,7 +81,7 @@ module Valigator
           when /invalid byte sequence/
             'invalid_encoding'
           else
-            raise ArgumentError, 'unknown type'
+            raise UnhandledTypeError, message
         end
       end
 
