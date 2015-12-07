@@ -32,7 +32,9 @@ module Valigator
         {
           col_sep: options[:col_sep] || ',',
           quote_char: options[:quote_char] || '"',
-          encoding: options[:encoding] || 'UTF-8'
+          encoding: options[:encoding] || 'UTF-8',
+          headers: options[:headers] || false,
+          return_headers: options[:return_headers] || false
         }
       end
 

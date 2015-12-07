@@ -20,6 +20,14 @@ module Valigator
         end
 
 
+        it "forwards csv header options" do
+          subject = described_class.new fixture('valid.csv')
+          expect(::CSV).to receive(:foreach).with(fixture('valid.csv'), col_sep: ',', quote_char: '"', encoding: 'UTF-8', headers: true, return_headers: false)
+
+          subject.validate headers: true, return_headers: false
+        end
+
+
         it 'should detect invalid byte sequence when opening with default encoding' do
           subject = described_class.new fixture('invalid_encoding.csv')
           subject.validate
@@ -89,6 +97,7 @@ module Valigator
             ]
           end
         end
+
       end
     end
 
