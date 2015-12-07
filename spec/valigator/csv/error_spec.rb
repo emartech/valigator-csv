@@ -60,9 +60,9 @@ module Valigator
 
       describe "#to_hash" do
         it "should return the error as a hash" do
-          error = described_class.new row: 1, type: 'stray_quote', message: "Missing or stray quote in line 1"
+          error = described_class.new row: 1, type: 'stray_quote', message: "Missing or stray quote in line 1", field: 'id'
 
-          expect(error.to_hash).to eq row: 1, type: 'stray_quote', message: "Missing or stray quote in line 1"
+          expect(error.to_hash).to eq row: 1, type: 'stray_quote', message: "Missing or stray quote in line 1", field: 'id'
         end
       end
     end
