@@ -15,7 +15,9 @@ module Valigator
 
 
       def validate(options = {})
-        ::CSV.foreach(@filename, build_options(options)) { |_row|}
+        ::CSV.foreach(@filename, csv_options(options)) do |row|
+          validate_fields row, options
+        end
       rescue ::CSV::MalformedCSVError, ArgumentError => error
         raise if unrelated_error?(error)
 
@@ -26,7 +28,7 @@ module Valigator
 
       private
 
-      def build_options(options = {})
+      def csv_options(options = {})
         {
           col_sep: options[:col_sep] || ',',
           quote_char: options[:quote_char] || '"',
@@ -38,6 +40,29 @@ module Valigator
 
       def unrelated_error?(error)
         error.is_a?(ArgumentError) && error.message != 'invalid byte sequence in UTF-8'
+      end
+
+
+
+      def validate_fields(row, options={})
+        return unless options[:fields] && options[:field_validators]
+
+        options[:fields].each_with_index do |field, index|
+          options[:field_validators][field].to_a.each do |field_validator|
+            add_field_error(field, field_validator) unless field_validator.valid? row[index]
+          end
+        end
+      end
+
+
+
+      def add_field_error(field, validator)
+        @errors << CSV::Error.new({
+          type: validator.error_type,
+          message: validator.error_message,
+          row: $INPUT_LINE_NUMBER,
+          field: field
+        })
       end
 
     end

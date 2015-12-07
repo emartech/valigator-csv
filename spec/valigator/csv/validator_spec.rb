@@ -50,6 +50,45 @@ module Valigator
           expect { subject.validate quote_char: 'asd'}.to raise_error ArgumentError, ':quote_char has to be a single character String'
         end
 
+
+        context 'mandatory field' do
+          subject { described_class.new fixture('missing_mandatory_field.csv') }
+
+          it 'does not validate unless fields given' do
+            options = {
+              field_validators: {
+                "id" => [Valigator::CSV::FieldValidators::Mandatory.new]
+              }
+            }
+
+            subject.validate(options)
+            expect(subject.errors).to eq []
+          end
+
+          it 'does not validate unless field validators given' do
+            options = {
+              fields: %w(id name)
+            }
+
+            subject.validate(options)
+            expect(subject.errors).to eq []
+          end
+
+          it 'reports field with nil value' do
+            options = {
+              fields: %w(id name),
+              field_validators: {
+                "id" => [Valigator::CSV::FieldValidators::Mandatory.new]
+              }
+            }
+
+            subject.validate(options)
+
+            expect(subject.errors).to eq [
+              Error.new(type: 'missing_field', message: 'Missing mandatory field', row: 4, field: 'id')
+            ]
+          end
+        end
       end
     end
 
