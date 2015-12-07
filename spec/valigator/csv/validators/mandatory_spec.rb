@@ -5,7 +5,7 @@ module Valigator
     module FieldValidators
       describe Mandatory do
 
-        context "#valid?" do
+        describe "#valid?" do
           it "returns true for valid value" do
             expect(subject.valid?("something")).to eq true
           end
