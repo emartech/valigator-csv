@@ -65,7 +65,7 @@ module Valigator
           it 'does not validate unless fields given' do
             options = {
               field_validators: {
-                "id" => [Valigator::CSV::FieldValidators::Mandatory.new]
+                "id" => Valigator::CSV::FieldValidators::Mandatory.new
               }
             }
 
@@ -86,7 +86,7 @@ module Valigator
             options = {
               fields: %w(id name),
               field_validators: {
-                "id" => [Valigator::CSV::FieldValidators::Mandatory.new]
+                "id" => Valigator::CSV::FieldValidators::Mandatory.new
               }
             }
 

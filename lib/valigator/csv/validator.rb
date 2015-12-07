@@ -50,8 +50,10 @@ module Valigator
         return unless options[:fields] && options[:field_validators]
 
         options[:fields].each_with_index do |field, index|
-          options[:field_validators][field].to_a.each do |field_validator|
-            add_field_error(field, field_validator) unless field_validator.valid? row[index]
+          field_validator = options[:field_validators][field]
+
+          if field_validator and !field_validator.valid?(row[index])
+            add_field_error(field, field_validator)
           end
         end
       end
