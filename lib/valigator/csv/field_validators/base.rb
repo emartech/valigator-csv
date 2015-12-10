@@ -2,6 +2,7 @@ module Valigator
   module CSV
     module FieldValidators
       class Base
+        attr_reader :options
 
         def initialize(options={})
           @options = options
@@ -27,6 +28,12 @@ module Valigator
 
 
 
+        def ==(other)
+          self.class == other.class && options == other.options
+        end
+
+
+
         private
 
         def blank?(value)
@@ -36,7 +43,7 @@ module Valigator
 
 
         def allow_blank
-          @options[:allow_blank]
+          options[:allow_blank]
         end
 
       end
