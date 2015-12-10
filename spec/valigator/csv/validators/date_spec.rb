@@ -6,29 +6,50 @@ module Valigator
       describe Date do
 
         describe "#valid?" do
-          it "returns true for valid value" do
-            expect(subject.valid?("2014-04-11")).to eq true
-          end
-
-          it "returns false for wrong value" do
-            expect(subject.valid?("not-a-date")).to eq false
-          end
-
-          it "returns false for invalid date" do
-            expect(subject.valid?("2014-04-31")).to eq false
+          {
+            "2014-04-11" => true,
+            "2014-04-31" => false,
+            "not-a-date" => false,
+            nil => false,
+            "" => false
+          }.each do |input, output|
+            it "returns #{output} for value: #{input.inspect}" do
+              expect(subject.valid?(input)).to eq(output)
+            end
           end
 
           context "with format option" do
-            subject { described_class.new(format: "%m-%d-%Y")}
+            subject { described_class.new format: "%m-%d-%Y" }
 
-            it "returns true for valid value" do
-              expect(subject.valid?("04-11-2014")).to eq true
-            end
-
-            it "returns false for invalid date" do
-              expect(subject.valid?("2014-04-11")).to eq false
+            {
+              "04-11-2014" => true,
+              "2014-04-11" => false,
+              "not-a-date" => false,
+              nil => false,
+              "" => false
+            }.each do |input, output|
+              it "returns #{output} for value: #{input.inspect}" do
+                expect(subject.valid?(input)).to eq(output)
+              end
             end
           end
+
+          context "with allow_blank option" do
+            subject { described_class.new allow_blank: true }
+
+            {
+              "2014-04-11" => true,
+              "2014-04-31" => false,
+              "not-a-date" => false,
+              nil => true,
+              "" => true
+            }.each do |input, output|
+              it "returns #{output} for value: #{input.inspect}" do
+                expect(subject.valid?(input)).to eq(output)
+              end
+            end
+          end
+
         end
 
       end

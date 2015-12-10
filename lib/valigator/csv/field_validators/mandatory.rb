@@ -1,10 +1,10 @@
 module Valigator
   module CSV
     module FieldValidators
-      class Mandatory
+      class Mandatory < Base
 
         def valid?(value)
-          !value.to_s.empty?
+          not blank? value
         end
 
 
@@ -18,6 +18,7 @@ module Valigator
         def error_message
           'Missing mandatory field'
         end
+
       end
     end
   end

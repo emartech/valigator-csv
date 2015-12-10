@@ -6,32 +6,36 @@ module Valigator
       describe Integer do
 
         describe "#valid?" do
-          it "returns true for valid value" do
-            expect(subject.valid?("1")).to eq true
+          {
+            nil => false,
+            "" => false,
+            "1" => true,
+            1 => true,
+            1.1 => false,
+            "abc" => false,
+            "123a" => false
+          }.each do |input, output|
+            it "returns #{output} for value: #{input.inspect}" do
+              expect(subject.valid?(input)).to eq(output)
+            end
           end
 
-          it "returns true for valid value" do
-            expect(subject.valid?(1)).to eq true
-          end
+          context "with allow_blank option" do
+            subject { described_class.new allow_blank: true }
 
-          it "returns true for nil value" do
-            expect(subject.valid?(nil)).to eq true
-          end
-
-          it "returns true for empty string" do
-            expect(subject.valid?("")).to eq true
-          end
-
-          it "returns false for float value" do
-            expect(subject.valid?(1.1)).to eq false
-          end
-
-          it "returns false for string value" do
-            expect(subject.valid?("abc")).to eq false
-          end
-
-          it "returns false for invalid value" do
-            expect(subject.valid?("123a")).to eq false
+            {
+              nil => true,
+              "" => true,
+              "1" => true,
+              1 => true,
+              1.1 => false,
+              "abc" => false,
+              "123a" => false
+            }.each do |input, output|
+              it "returns #{output} for value: #{input.inspect}" do
+                expect(subject.valid?(input)).to eq(output)
+              end
+            end
           end
         end
 

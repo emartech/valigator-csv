@@ -6,8 +6,8 @@ require 'valigator/csv/version'
 Gem::Specification.new do |spec|
   spec.name          = 'valigator-csv'
   spec.version       = Valigator::CSV::VERSION
-  spec.authors       = ['Daniel Nagy', 'Istvan Demeter']
-  spec.email         = ['naitodai@gmail.com', 'demeter.istvan@gmail.com']
+  spec.authors       = ['Daniel Nagy', 'Istvan Demeter', 'Tamas Drahos']
+  spec.email         = ['naitodai@gmail.com', 'demeter.istvan@gmail.com', 'drahostamas@gmail.com']
 
   spec.summary       = %q{Yet another CSV validator library}
   spec.description   = %q{Yet another CSV validator library. Just better.}

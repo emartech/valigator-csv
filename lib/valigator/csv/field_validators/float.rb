@@ -3,16 +3,10 @@ module Valigator
     module FieldValidators
       class Float < Integer
 
-        def initialize(options = {})
-          @options = options
-        end
-
-
-
         def valid?(value)
           formatted = formatted_value(value)
 
-          formatted.to_f.to_s == formatted || super
+          super || value.is_a?(::Float) || formatted.to_f.to_s == formatted
         end
 
 
@@ -38,7 +32,7 @@ module Valigator
 
 
         def formatted_value(value)
-          decimal_mark ? value.gsub(decimal_mark, '.') : value
+          decimal_mark ? value.to_s.gsub(decimal_mark, '.') : value
         end
 
 

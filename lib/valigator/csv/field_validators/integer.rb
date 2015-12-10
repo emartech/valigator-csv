@@ -1,12 +1,12 @@
 module Valigator
   module CSV
     module FieldValidators
-      class Integer
+      class Integer < Base
 
         def valid?(value)
-          return true if value.to_s.empty?
+          return true if allow_blank and blank? value
 
-          value.to_i.to_s == value.to_s
+          value.is_a?(::Integer) || value.to_i.to_s == value.to_s
         end
 
 

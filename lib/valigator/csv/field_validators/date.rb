@@ -1,16 +1,12 @@
 module Valigator
   module CSV
     module FieldValidators
-      class Date
-
-        def initialize(options={})
-          @options = options
-        end
-
-
+      class Date < Base
 
         def valid?(value)
-          format ? ::Date.strptime(value, format) : ::Date.parse(value)
+          return true if allow_blank and blank? value
+
+          parse value
           true
         rescue ArgumentError
           false
@@ -34,6 +30,12 @@ module Valigator
 
         def format
           @options[:format]
+        end
+
+
+
+        def parse(value)
+          format ? ::Date.strptime(value.to_s, format) : ::Date.parse(value.to_s)
         end
 
       end
