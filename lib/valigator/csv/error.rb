@@ -1,5 +1,9 @@
 module Valigator
   module CSV
+    class ErrorsLimitReachedError < StandardError
+    end
+
+
     class UnhandledTypeError < StandardError
     end
 

@@ -98,6 +98,48 @@ module Valigator
           end
         end
 
+
+        context 'abort validation' do
+          subject { described_class.new fixture('too_many_errors.csv') }
+          let(:config) { Hash[
+              headers: true,
+              fields: %w(order date customer item c_sales_amount quantity unit_price),
+              field_validators: {
+                  "order" => Valigator::CSV::FieldValidators::Date.new(format: '%Y%m%d'),
+                  "date" => Valigator::CSV::FieldValidators::Date.new(format: '%Y%m%d'),
+                  "customer" => Valigator::CSV::FieldValidators::Date.new(format: '%Y%m%d'),
+                  "ite±m" => Valigator::CSV::FieldValidators::Date.new(format: '%Y%m%d'),
+                  "c_sales_amount" => Valigator::CSV::FieldValidators::Date.new(format: '%Y%m%d'),
+                  "quantity" => Valigator::CSV::FieldValidators::Date.new(format: '%Y%m%d'),
+                  "unit_price" => Valigator::CSV::FieldValidators::Date.new(format: '%Y%m%d')
+              }
+          ] }
+
+
+          it 'aborts when reaching default value' do
+            subject.validate(config)
+
+            expect(subject.errors.size).to eq(1000 + 1)
+            expect(subject.errors.last).to eq(Error.new(type: 'too_many_errors',  message: 'Too many errors were found'))
+          end
+
+
+          it 'aborts when reaching value given as option' do
+            subject.validate(config.merge(errors_limit: 1))
+
+            expect(subject.errors.size).to eq(1 + 1)
+            expect(subject.errors.last).to eq(Error.new(type: 'too_many_errors',  message: 'Too many errors were found'))
+          end
+
+
+          it 'setting the limit to nil disables the limit' do
+            subject.validate(config.merge(errors_limit: nil))
+
+            expect(subject.errors.size).to be > 1000
+            expect(subject.errors.last).not_to eq(Error.new(type: 'too_many_errors',  message: 'Too many errors were found'))
+          end
+        end
+
       end
     end
 
