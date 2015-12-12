@@ -4,9 +4,7 @@ module Valigator
       class Float < Integer
 
         def valid?(value)
-          formatted = formatted_value(value)
-
-          super || value.is_a?(::Float) || formatted.to_f.to_s == formatted
+          super || value.is_a?(::Float) || formatted_float?(value)
         end
 
 
@@ -31,10 +29,18 @@ module Valigator
 
 
 
+        def formatted_float?(value)
+          Float(formatted_value(value))
+          true
+        rescue ArgumentError, TypeError
+          false
+        end
+
+
+
         def formatted_value(value)
           decimal_mark ? value.to_s.gsub(decimal_mark, '.') : value
         end
-
 
       end
     end
