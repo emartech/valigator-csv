@@ -18,8 +18,11 @@ module Valigator
       def validate(options = {})
         config.merge! options
 
-        ::CSV.foreach(@filename, csv_options(options)) do |row|
+        ::CSV.foreach(filename, csv_options(options)) do |row|
           validate_fields row, options
+          validate_row row, options
+
+          stop_if_error_limit_reached
         end
       rescue ErrorsLimitReachedError
       rescue ::CSV::MalformedCSVError, ArgumentError => error
@@ -57,26 +60,43 @@ module Valigator
 
 
 
-      def validate_fields(row, options={})
+      def validate_fields(row, options = {})
         return unless options[:fields] && options[:field_validators]
 
         options[:fields].each_with_index do |field, index|
-          field_validator = options[:field_validators][field]
+          validator = options[:field_validators][field]
 
-          if field_validator and !field_validator.valid?(row[index])
-            add_field_error(field, field_validator)
-
-            if config[:errors_limit] && errors.size >= config[:errors_limit]
-              errors << CSV::Error.new({type: 'too_many_errors', message: 'Too many errors were found'})
-              raise ErrorsLimitReachedError
-            end
+          if validator && !validator.valid?(row[index])
+            add_error_for(validator, field)
           end
         end
       end
 
 
 
-      def add_field_error(field, validator)
+      def stop_if_error_limit_reached
+        if config[:errors_limit] && errors.size >= config[:errors_limit]
+          errors << CSV::Error.new({type: 'too_many_errors', message: 'Too many errors were found'})
+          raise ErrorsLimitReachedError
+        end
+      end
+
+
+
+      def validate_row(row, options = {})
+        return unless options[:fields] && options[:row_validators]
+
+        options[:row_validators].each do |validator_class|
+          validator = validator_class.new(options)
+          next if validator.valid?(row)
+
+          add_error_for validator
+        end
+      end
+
+
+
+      def add_error_for(validator, field = nil)
         errors << CSV::Error.new({
           type: validator.error_type,
           message: validator.error_message,
