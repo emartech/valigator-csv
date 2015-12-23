@@ -55,7 +55,7 @@ module Valigator
 
 
       def unrelated_error?(error)
-        error.is_a?(ArgumentError) && error.message != 'invalid byte sequence in UTF-8'
+        error.is_a?(ArgumentError) && error.message !~ /invalid byte sequence in/
       end
 
 
