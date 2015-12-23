@@ -14,7 +14,7 @@ module Valigator
 
         it 'should use the provided dialect to parse the CSV' do
           subject = described_class.new fixture('valid_custom.csv')
-          subject.validate col_sep: ";", quote_char: "'"
+          subject.validate(col_sep: ";", quote_char: "'")
 
           expect(subject.errors).to eq([])
         end
@@ -41,6 +41,24 @@ module Valigator
           subject.validate(encoding: 'ISO-8859-9')
 
           expect(subject.errors).to eq([])
+        end
+
+
+        it 'should detect invalid encoding' do
+          subject = described_class.new fixture('invalid_encoding2.csv')
+          config = {
+            :encoding => "BOM|UTF-8",
+            :col_sep => "\t",
+            :quote_char => "\"",
+            :headers => true,
+            :fields => ["brandcode", "order", "storecode", "date", "hour", "customer", "superid", "item", "quantity", "unitprice", "c_sales_amount", "postdate"],
+            :field_validators => {
+              "quantity" => Valigator::CSV::FieldValidators::Float.new({:decimal_mark => nil, :allow_blank => false})
+            }
+          }
+          subject.validate(config)
+
+          expect(subject.errors).to eq([Error.new(row: nil, type: 'invalid_encoding', message: 'ASCII incompatible encoding: UTF-16LE')])
         end
 
 
@@ -92,9 +110,7 @@ module Valigator
 
             subject.validate(options)
 
-            expect(subject.errors).to eq [
-              Error.new(type: 'missing_field', message: 'Missing mandatory field', row: 4, field: 'id')
-            ]
+            expect(subject.errors).to eq [Error.new(type: 'missing_field', message: 'Missing mandatory field', row: 4, field: 'id')]
           end
         end
 
@@ -112,16 +128,12 @@ module Valigator
           it 'reports rows with different number of fields than the options' do
             options = {
               fields: %w(id name),
-              row_validators: [
-                Valigator::CSV::RowValidators::Ragged
-              ]
+              row_validators: [Valigator::CSV::RowValidators::Ragged]
             }
 
             subject.validate(options)
 
-            expect(subject.errors).to eq [
-              Error.new(type: 'ragged_row', message: 'Ragged or empty row', row: 3)
-            ]
+            expect(subject.errors).to eq [Error.new(type: 'ragged_row', message: 'Ragged or empty row', row: 3)]
           end
 
 

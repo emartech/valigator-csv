@@ -25,7 +25,7 @@ module Valigator
           stop_if_error_limit_reached
         end
       rescue ErrorsLimitReachedError
-      rescue ::CSV::MalformedCSVError, ArgumentError => error
+      rescue ::CSV::MalformedCSVError, Encoding::CompatibilityError, ArgumentError => error
         raise if unrelated_error?(error)
 
         errors << CSV::Error.new(error)

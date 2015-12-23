@@ -86,6 +86,8 @@ module Valigator
             'unclosed_quote'
           when /invalid byte sequence/
             'invalid_encoding'
+          when /incompatible encoding/
+            'invalid_encoding'
           else
             raise UnhandledTypeError, message
         end
