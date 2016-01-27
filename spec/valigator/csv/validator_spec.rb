@@ -78,6 +78,14 @@ module Valigator
         end
 
 
+        it 'detects inconsistent line breaks' do
+          subject = described_class.new fixture('inconsistent_line_breaks.csv')
+          subject.validate
+
+          expect(subject.errors).to eq [Error.new(row: 2, type: 'line_breaks', message: 'Unquoted fields do not allow \\r or \\n (line 2).')]
+        end
+
+
         it 'should (re)raise error, if it is not directly parsing related' do
           subject = described_class.new fixture('unclosed_quote.csv')
 
