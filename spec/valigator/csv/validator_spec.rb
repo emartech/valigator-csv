@@ -70,6 +70,14 @@ module Valigator
         end
 
 
+        it 'detects stray quote' do
+          subject = described_class.new fixture('stray_quote.csv')
+          subject.validate
+
+          expect(subject.errors).to eq [Error.new(row: 2, type: 'stray_quote', message: 'Missing or stray quote in line 2')]
+        end
+
+
         it 'should (re)raise error, if it is not directly parsing related' do
           subject = described_class.new fixture('unclosed_quote.csv')
 
