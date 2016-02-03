@@ -44,7 +44,7 @@ module Valigator
         end
 
 
-        it 'should detect invalid encoding' do
+        xit 'should detect invalid encoding' do
           subject = described_class.new fixture('invalid_encoding2.csv')
           config = {
             :encoding => "BOM|UTF-8",
