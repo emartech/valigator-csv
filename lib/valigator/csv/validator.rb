@@ -67,7 +67,7 @@ module Valigator
           validator = options[:field_validators][field]
 
           if validator && !validator.valid?(row[index])
-            add_error_for(validator, field)
+            add_error_for(validator, field, row)
           end
         end
       end
@@ -94,17 +94,25 @@ module Valigator
         end
       end
 
+      def add_error_for(validator, field = nil, row = nil)
+        error_hash = error_hash(validator, field)
+        error_hash.merge!({details: error_details(row)}) if error_details(row)
 
+        errors << CSV::Error.new(error_hash)
+      end
 
-      def add_error_for(validator, field = nil)
-        errors << CSV::Error.new({
+      def error_hash(validator, field = nil)
+        {
           type: validator.error_type,
           message: validator.error_message,
           row: $INPUT_LINE_NUMBER,
           field: field
-        })
+        }
       end
 
+      def error_details(row)
+        config[:details].call(row) if config.has_key?(:details)
+      end
     end
   end
 end

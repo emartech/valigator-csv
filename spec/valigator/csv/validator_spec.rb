@@ -200,6 +200,27 @@ module Valigator
           end
         end
 
+        context "when details proc is given in the config" do
+          subject { described_class.new fixture("invalid_field_type.csv") }
+
+          let(:config) do
+            {
+              headers: true,
+              fields: ["source_id", "order"],
+              field_validators: {
+                "order" => Valigator::CSV::FieldValidators::Integer.new(allow_blank: false)
+              },
+              details: -> (erroneous_row) { {contact_id: erroneous_row["source_id"]} if erroneous_row.has_key?("source_id") }
+            }
+          end
+
+          it "adds details into the current error" do
+            subject.validate(config)
+
+            expect(subject.errors).to eq([Error.new(row: 2, type: "invalid_integer", message: "Invalid integer field", field: "order", details: {contact_id: "123"})])
+          end
+        end
+
       end
     end
 

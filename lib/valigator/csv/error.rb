@@ -10,7 +10,7 @@ module Valigator
 
     class Error
 
-      attr_reader :row, :type, :message, :field
+      attr_reader :row, :type, :message, :field, :details
 
 
 
@@ -26,7 +26,7 @@ module Valigator
 
 
       def ==(other)
-        row == other.row && message == other.message && type == other.type && field == other.field
+        row == other.row && message == other.message && type == other.type && field == other.field && details == other.details
       end
 
 
@@ -36,7 +36,8 @@ module Valigator
           row: row,
           type: type,
           message: message,
-          field: field
+          field: field,
+          details: details
         }
       end
 
@@ -45,7 +46,7 @@ module Valigator
       private
 
       def build_from_hash(error)
-        build error[:type], error[:message], error[:row], error[:field]
+        build error[:type], error[:message], error[:row], error[:field], error[:details]
       end
 
 
@@ -63,11 +64,12 @@ module Valigator
 
 
 
-      def build(type, message, row, field=nil)
+      def build(type, message, row, field = nil, details = nil)
         @type = type
         @row = row
         @message = message
         @field = field
+        @details = details
       end
 
 
