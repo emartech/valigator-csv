@@ -86,9 +86,7 @@ module Valigator
             'field_size'
           when /Unclosed quoted field/
             'unclosed_quote'
-          when /invalid byte sequence/
-            'invalid_encoding'
-          when /incompatible encoding/
+          when /invalid byte sequence/, /incompatible encoding/, /incompatible character encodings/
             'invalid_encoding'
           else
             raise UnhandledTypeError, message

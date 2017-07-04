@@ -44,21 +44,22 @@ module Valigator
         end
 
 
-        xit 'should detect invalid encoding' do
-          subject = described_class.new fixture('invalid_encoding2.csv')
+        it 'detects invalid encoding if a field validator tries to convert into another encoding' do
+          field_validator = double("FieldValidator")
+          allow(field_validator).to receive(:valid?) do |value|
+            "some string".force_encoding(Encoding::UTF_8).include?(value.force_encoding(Encoding::UTF_16))
+          end
+
+          subject = described_class.new fixture('valid.csv')
           config = {
-            :encoding => "BOM|UTF-8",
-            :col_sep => "\t",
-            :quote_char => "\"",
-            :headers => true,
-            :fields => ["brandcode", "order", "storecode", "date", "hour", "customer", "superid", "item", "quantity", "unitprice", "c_sales_amount", "postdate"],
-            :field_validators => {
-              "quantity" => Valigator::CSV::FieldValidators::Float.new({:decimal_mark => nil, :allow_blank => false})
+            fields: %w(Foo),
+            field_validators: {
+              "Foo" => field_validator
             }
           }
           subject.validate(config)
 
-          expect(subject.errors).to eq([Error.new(row: nil, type: 'invalid_encoding', message: 'ASCII incompatible encoding: UTF-16LE')])
+          expect(subject.errors).to eq([Error.new(row: nil, type: 'invalid_encoding', message: 'incompatible character encodings: UTF-8 and UTF-16')])
         end
 
 
