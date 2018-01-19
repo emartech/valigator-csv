@@ -63,20 +63,15 @@ module Valigator
       def validate_fields(row, options = {})
         return unless options[:fields] && options[:field_validators]
 
-        index = 0
-        fields = options[:fields]
-
-        while index < fields.size
-          field = fields[index]
+        options[:fields].each_with_index do |field, index|
           validator = options[:field_validators][field]
 
           if validator && !validator.valid?(row[index])
             add_error_for(validator, field, row)
           end
-
-          index += 1
         end
       end
+
 
 
       def stop_if_error_limit_reached
@@ -101,7 +96,7 @@ module Valigator
 
       def add_error_for(validator, field = nil, row = nil)
         error_hash = error_hash(validator, field)
-        error_hash[:details] = error_details(row) if error_details(row)
+        error_hash.merge!({details: error_details(row)}) if error_details(row)
 
         errors << CSV::Error.new(error_hash)
       end
