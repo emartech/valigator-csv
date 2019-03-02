@@ -1,5 +1,5 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-require 'valigator'
+require 'valigator/csv'
 require 'support/fixtures'
 
 RSpec.configure do |c|

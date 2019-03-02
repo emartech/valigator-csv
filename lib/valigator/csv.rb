@@ -1,3 +1,4 @@
+require 'csv'
 require 'valigator/csv/version'
 
 module Valigator
