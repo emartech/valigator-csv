@@ -1,3 +1,5 @@
+require 'valigator/csv/version'
+
 module Valigator
   module CSV
     autoload :Error, 'valigator/csv/error'
@@ -6,6 +8,5 @@ module Valigator
     autoload :Validator, 'valigator/csv/validator'
     autoload :FieldValidators, 'valigator/csv/field_validators'
     autoload :RowValidators, 'valigator/csv/row_validators'
-    autoload :Version, 'valigator/csv/version'
   end
 end
