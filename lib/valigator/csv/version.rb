@@ -1,5 +1,5 @@
 module Valigator
   module CSV
-    VERSION = "1.5.1"
+    VERSION = "2.0"
   end
 end
