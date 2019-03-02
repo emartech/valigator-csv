@@ -1,5 +1,3 @@
-require 'csv'
-
 module Valigator
   module CSV
     class Validator
@@ -9,6 +7,7 @@ module Valigator
 
       def initialize(filename)
         @filename = filename
+        @current_row_number = 0
         @errors = []
         @config = default_config
       end
@@ -17,8 +16,10 @@ module Valigator
 
       def validate(options = {})
         config.merge! options
+        @current_row_number = csv_options(options)[:headers] ? 1 : 0
 
         ::CSV.foreach(filename, csv_options(options)) do |row|
+          @current_row_number += 1
           validate_fields row, options
           validate_row row, options
 
@@ -105,7 +106,7 @@ module Valigator
         {
           type: validator.error_type,
           message: validator.error_message,
-          row: $INPUT_LINE_NUMBER,
+          row: @current_row_number,
           field: field
         }
       end

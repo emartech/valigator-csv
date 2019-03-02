@@ -1,10 +1,7 @@
-require 'spec_helper'
-require 'csv'
-
-describe Valigator::CSV::Error do
-  row = 123
-  type = "error_type"
-  message = "Missing or stray quote in line #{row}"
+RSpec.describe Valigator::CSV::Error do
+  let(:row) { 123 }
+  let(:type) { "error_type" }
+  let(:message) { "Missing or stray quote" }
 
   describe "#initialize" do
     context "from hash" do
@@ -15,27 +12,29 @@ describe Valigator::CSV::Error do
         expect(error.type).to eq(type)
       end
 
-
       it "does not assign unknown fields" do
         error = described_class.new({nope: "nope"})
         expect(error).not_to respond_to(:nope)
       end
     end
 
+    context "from MalformedCSVError exception in Ruby 2.5 and earlier", ruby: '< 2.6' do
+      let(:examples) do
+        [
+          {message: "Missing or stray quote in line #{row}", type: 'stray_quote'},
+          {message: "Unquoted fields do not allow \\r or \\n (line #{row}).", type: 'line_breaks'},
+          {message: "Illegal quoting in line #{row}.", type: 'illegal_quoting'},
+          {message: "Field size exceeded on line #{row}.", type: 'field_size'},
+          {message: "Unclosed quoted field on line #{row}.", type: 'unclosed_quote'}
+        ]
+      end
 
-    context "from MalformedCSVError exception" do
-      [
-        [::CSV::MalformedCSVError.new("Missing or stray quote in line #{row}"), 'stray_quote'],
-        [::CSV::MalformedCSVError.new("Unquoted fields do not allow \\r or \\n (line #{row})."), 'line_breaks'],
-        [::CSV::MalformedCSVError.new("Illegal quoting in line #{row}."), 'illegal_quoting'],
-        [::CSV::MalformedCSVError.new("Field size exceeded on line #{row}."), 'field_size'],
-        [::CSV::MalformedCSVError.new("Unclosed quoted field on line #{row}."), 'unclosed_quote'],
-      ].each do |original_error, type|
-        it "maps correctly" do
-          error = described_class.new(original_error)
+      it "maps each error correctly" do
+        examples.each do |example|
+          error = described_class.new(::CSV::MalformedCSVError.new(example[:message]))
 
           expect(error.row).to eq(row)
-          expect(error.type).to eq(type)
+          expect(error.type).to eq(example[:type])
         end
       end
 
@@ -45,12 +44,49 @@ describe Valigator::CSV::Error do
         expect(error.message).to eq(message)
       end
 
+      context "for unknown errors" do
+        let(:message) { "Unknown error message" }
 
-      it "raises excaption for unhandled error types" do
-        error_message = 'I forgot to handle this error on line 666'
+        it "raises an unhandled error" do
+          expect { described_class.new(::CSV::MalformedCSVError.new(message)) }
+            .to raise_error(Valigator::CSV::UnhandledTypeError, message)
+        end
+      end
+    end
 
-        expect {described_class.new(::CSV::MalformedCSVError.new(error_message))}
-          .to raise_error(Valigator::CSV::UnhandledTypeError, error_message)
+    context "from MalformedCSVError exception in Ruby 2.6 and later", ruby: '>= 2.6' do
+      let(:examples) do
+        [
+          {message: "Missing or stray quote", type: 'stray_quote'},
+          {message: "Unquoted fields do not allow \\r or \\n", type: 'line_breaks'},
+          {message: "Illegal quoting", type: 'illegal_quoting'},
+          {message: "Field size exceeded", type: 'field_size'},
+          {message: "Unclosed quoted field", type: 'unclosed_quote'}
+        ]
+      end
+      let(:csv_error) { ::CSV::MalformedCSVError.new(message, row) }
+
+      it "maps each error correctly" do
+        examples.each do |example|
+          error = described_class.new(::CSV::MalformedCSVError.new(example[:message], row))
+
+          expect(error.row).to eq(row)
+          expect(error.type).to eq(example[:type])
+        end
+      end
+
+      it "keeps the original message" do
+        error = described_class.new(csv_error)
+
+        expect(error.message).to start_with(message)
+      end
+
+      context "for unknown errors" do
+        let(:message) { "Unknown error message" }
+
+        it "raises an unhandled error" do
+          expect { described_class.new(csv_error) }.to raise_error(Valigator::CSV::UnhandledTypeError, csv_error.message)
+        end
       end
     end
 
@@ -61,7 +97,6 @@ describe Valigator::CSV::Error do
       end
     end
   end
-
 
   describe "#to_hash" do
     it "should return the error as a hash" do

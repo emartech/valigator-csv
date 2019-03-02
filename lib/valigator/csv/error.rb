@@ -52,7 +52,14 @@ module Valigator
 
 
       def build_from_error(error)
-        build map_to_type(error.message), error.message, determine_row(error.message)
+        error_message = standardize_message(error.message)
+        build map_to_type(error_message), error_message, determine_row(error_message)
+      end
+
+
+
+      def standardize_message(message)
+        message.sub('Do not allow except col_sep_split_separator after quoted fields', 'Missing or stray quote')
       end
 
 
@@ -86,7 +93,7 @@ module Valigator
             'field_size'
           when /Unclosed quoted field/
             'unclosed_quote'
-          when /invalid byte sequence/, /incompatible encoding/, /incompatible character encodings/
+          when /invalid byte sequence/i, /incompatible encoding/i, /incompatible character encodings/i
             'invalid_encoding'
           else
             raise UnhandledTypeError, message
