@@ -43,15 +43,6 @@ RSpec.describe Valigator::CSV::Error do
 
         expect(error.message).to eq(message)
       end
-
-      context "for unknown errors" do
-        let(:message) { "Unknown error message" }
-
-        it "raises an unhandled error" do
-          expect { described_class.new(::CSV::MalformedCSVError.new(message)) }
-            .to raise_error(Valigator::CSV::UnhandledTypeError, message)
-        end
-      end
     end
 
     context "from MalformedCSVError exception in Ruby 2.6 and later", ruby: '>= 2.6' do
@@ -80,13 +71,15 @@ RSpec.describe Valigator::CSV::Error do
 
         expect(error.message).to start_with(message)
       end
+    end
 
-      context "for unknown errors" do
-        let(:message) { "Unknown error message" }
+    context "for unknown errors" do
+      let(:message) { "Unknown error message" }
 
-        it "raises an unhandled error" do
-          expect { described_class.new(csv_error) }.to raise_error(Valigator::CSV::UnhandledTypeError, csv_error.message)
-        end
+      it "returns an unknown error" do
+        error = described_class.new(::CSV::MalformedCSVError.new(message, row))
+        expect(error.row).to eq(row)
+        expect(error.type).to eq('unknown_error')
       end
     end
 
