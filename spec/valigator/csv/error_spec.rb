@@ -25,7 +25,8 @@ RSpec.describe Valigator::CSV::Error do
           {message: "Unquoted fields do not allow \\r or \\n (line #{row}).", type: 'line_breaks'},
           {message: "Illegal quoting in line #{row}.", type: 'illegal_quoting'},
           {message: "Field size exceeded on line #{row}.", type: 'field_size'},
-          {message: "Unclosed quoted field on line #{row}.", type: 'unclosed_quote'}
+          {message: "Unclosed quoted field on line #{row}.", type: 'unclosed_quote'},
+          {message: "TODO: Meaningful message in line #{row}.", type: 'unknown_error'}
         ]
       end
 
@@ -43,16 +44,6 @@ RSpec.describe Valigator::CSV::Error do
 
         expect(error.message).to eq(message)
       end
-
-      context "for unknown errors" do
-        let(:message) { "Unknown error on line #{row}." }
-
-        it "returns an unknown error" do
-          error = described_class.new(::CSV::MalformedCSVError.new(message))
-          expect(error.row).to eq(row)
-          expect(error.type).to eq('unknown_error')
-        end
-      end
     end
 
     context "from MalformedCSVError exception in Ruby 2.6 and later", ruby: '>= 2.6' do
@@ -62,7 +53,8 @@ RSpec.describe Valigator::CSV::Error do
           {message: "Unquoted fields do not allow \\r or \\n", type: 'line_breaks'},
           {message: "Illegal quoting", type: 'illegal_quoting'},
           {message: "Field size exceeded", type: 'field_size'},
-          {message: "Unclosed quoted field", type: 'unclosed_quote'}
+          {message: "Unclosed quoted field", type: 'unclosed_quote'},
+          {message: "TODO: Meaningful message", type: 'unknown_error'}
         ]
       end
       let(:csv_error) { ::CSV::MalformedCSVError.new(message, row) }
@@ -80,16 +72,6 @@ RSpec.describe Valigator::CSV::Error do
         error = described_class.new(csv_error)
 
         expect(error.message).to start_with(message)
-      end
-
-      context "for unknown errors" do
-        let(:message) { "Unknown error message" }
-
-        it "returns an unknown error" do
-          error = described_class.new(::CSV::MalformedCSVError.new(message, row))
-          expect(error.row).to eq(row)
-          expect(error.type).to eq('unknown_error')
-        end
       end
     end
 
