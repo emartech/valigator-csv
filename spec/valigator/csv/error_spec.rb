@@ -21,8 +21,8 @@ RSpec.describe Valigator::CSV::Error do
     context "from MalformedCSVError exception in Ruby 2.5 and earlier", ruby: '< 2.6' do
       let(:examples) do
         [
-          {message: "Missing or stray quote in line #{row}", type: 'stray_quote'},
           {message: "Unquoted fields do not allow \\r or \\n (line #{row}).", type: 'line_breaks'},
+          {message: "Missing or stray quote in line #{row}", type: 'illegal_quoting'},
           {message: "Illegal quoting in line #{row}.", type: 'illegal_quoting'},
           {message: "Field size exceeded on line #{row}.", type: 'field_size'},
           {message: "Unclosed quoted field on line #{row}.", type: 'unclosed_quote'},
@@ -49,9 +49,11 @@ RSpec.describe Valigator::CSV::Error do
     context "from MalformedCSVError exception in Ruby 2.6 and later", ruby: '>= 2.6' do
       let(:examples) do
         [
-          {message: "Missing or stray quote", type: 'stray_quote'},
           {message: "Unquoted fields do not allow \\r or \\n", type: 'line_breaks'},
+          {message: "Unquoted fields do not allow new line <\"\\r\">", type: 'line_breaks'},
+          {message: "Missing or stray quote", type: 'illegal_quoting'},
           {message: "Illegal quoting", type: 'illegal_quoting'},
+          {message: "Any value after quoted field isn't allowed", type: 'illegal_quoting'},
           {message: "Field size exceeded", type: 'field_size'},
           {message: "Unclosed quoted field", type: 'unclosed_quote'},
           {message: "TODO: Meaningful message", type: 'unknown_error'}
@@ -85,9 +87,9 @@ RSpec.describe Valigator::CSV::Error do
 
   describe "#to_hash" do
     it "should return the error as a hash" do
-      error = described_class.new row: 1, type: 'stray_quote', message: "Missing or stray quote in line 1", field: 'id', details: {key: "value"}
+      error = described_class.new row: 1, type: 'illegal_quoting', message: "Missing or stray quote in line 1", field: 'id', details: {key: "value"}
 
-      expect(error.to_hash).to eq row: 1, type: 'stray_quote', message: "Missing or stray quote in line 1", field: 'id', details: {key: "value"}
+      expect(error.to_hash).to eq row: 1, type: 'illegal_quoting', message: "Missing or stray quote in line 1", field: 'id', details: {key: "value"}
     end
   end
 end

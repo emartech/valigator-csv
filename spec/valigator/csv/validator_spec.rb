@@ -3,12 +3,12 @@ RSpec.describe Valigator::CSV::Validator do
   let(:filename) { 'valid.csv' }
 
   describe '#validate' do
-    def expect_one_csv_error(type:, message:, row: nil, field: nil)
+    def expect_one_csv_error(type:, message: nil, row: nil, field: nil)
       expect(validator.errors.count).to eq 1
       error = validator.errors.first
       expect(error).to be_a Valigator::CSV::Error
       expect(error.type).to eq type
-      expect(error.message).to match message
+      expect(error.message).to match message if message
       expect(error.row).to eq row if row
       expect(error.field).to eq field if field
     end
@@ -20,7 +20,8 @@ RSpec.describe Valigator::CSV::Validator do
 
 
     it '(re)raises all errors, if they are not directly parsing related' do
-      expect { validator.validate quote_char: 'asd' }.to raise_error ArgumentError, ':quote_char has to be a single character String'
+      allow(::CSV).to receive(:foreach).and_raise ArgumentError, ':quote_char has to be a single character String'
+      expect { validator.validate }.to raise_error ArgumentError, ':quote_char has to be a single character String'
     end
 
 
@@ -91,12 +92,12 @@ RSpec.describe Valigator::CSV::Validator do
     end
 
 
-    context 'when the file has a stray quote' do
+    context 'when the file has illegal quoting' do
       let(:filename) { 'stray_quote.csv' }
 
       it 'detects stray quotes' do
         validator.validate
-        expect_one_csv_error type: 'stray_quote', message: /Missing or stray quote/, row: 2
+        expect_one_csv_error type: 'illegal_quoting', row: 2
       end
     end
 
@@ -106,7 +107,7 @@ RSpec.describe Valigator::CSV::Validator do
 
       it 'detects inconsistent line breaks' do
         validator.validate
-        expect_one_csv_error type: 'line_breaks', message: /Unquoted fields do not allow \\r or \\n/, row: 2
+        expect_one_csv_error type: 'line_breaks', row: 2
       end
     end
 

@@ -63,11 +63,9 @@ module Valigator
 
       def map_to_type(message)
         case message
-          when /Missing or stray quote/
-            'stray_quote'
           when /Unquoted fields do not allow/
             'line_breaks'
-          when /Illegal quoting/
+          when /Missing or stray quote/, /Illegal quoting/, /Any value after quoted field isn't allowed/
             'illegal_quoting'
           when /Field size exceeded/
             'field_size'
