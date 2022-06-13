@@ -18,7 +18,7 @@ module Valigator
         config.merge! options
         @current_row_number = csv_options(options)[:headers] ? 1 : 0
 
-        ::CSV.foreach(filename, csv_options(options)) do |row|
+        ::CSV.foreach(filename, **csv_options(options)) do |row|
           @current_row_number += 1
           validate_fields row, options
           validate_row row, options
