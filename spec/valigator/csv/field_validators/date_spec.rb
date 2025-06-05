@@ -50,6 +50,21 @@ module Valigator
             end
           end
 
+          context "with format option %Y-%m-%d" do
+            subject { described_class.new format: "%Y-%m-%d" }
+
+            {
+              "04-11-2014" => false,
+              "2024-04-11" => true,
+              nil => false,
+              "" => false
+            }.each do |input, output|
+              it "returns #{output} for value: #{input.inspect}" do
+                expect(subject.valid?(input)).to eq(output)
+              end
+            end
+          end
+
           context "with allow_blank option" do
             subject { described_class.new allow_blank: true }
 
