@@ -29,8 +29,10 @@ module Valigator
         private
 
         def strict_parse_date(value, format)
-          date = ::Date.strptime(value, format)
-          if date.strftime(format) != value
+          today = ::Date.today.strftime(format).to_s
+          trimmed_value = value.nil? || value == ""  ? '' : value.to_s[0, today.length]
+          date = ::Date.strptime(trimmed_value, format)
+          if date.strftime(format) != trimmed_value
             raise ArgumentError, "Date does not match the expected format: #{value}"
           end
           date
@@ -40,12 +42,21 @@ module Valigator
           @options[:format]
         end
 
-
-
-        def parse(value)
-          format ? strict_parse_date(value.to_s, format) : ::Date.parse(value.to_s)
+        def strict_validate_date_format
+          @options[:strict_validate_date_format] || false
         end
 
+        def parse(value)
+          if format
+            if strict_validate_date_format
+              strict_parse_date(value.to_s, format)
+            else
+              ::Date.strptime(value.to_s, format)
+            end
+          else
+            ::Date.parse(value.to_s)
+          end
+        end
       end
     end
   end
